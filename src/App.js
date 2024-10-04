@@ -6,13 +6,14 @@ import New from "./pages/new/New";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { productInputs, userInputs } from "./formSource";
 import "./style/dark.scss";
-import { Children, useContext } from "react";
+import {useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
+import { AuthContext } from "./context/AuthContext";
 
 function App() {
   const { darkMode } = useContext(DarkModeContext);
 
-  const currentUser = false;
+  const {currentUser} = useContext(AuthContext);
 
   const RequireAuth = ({children}) => {
     return currentUser ? children : <Navigate to="/login" />;

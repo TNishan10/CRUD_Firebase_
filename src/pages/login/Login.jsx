@@ -1,47 +1,49 @@
-import "./login.scss"
-import { useContext, useState } from "react"
-import {signInWithEmailAndPassword} from "firebase/auth";
-import {auth} from "../../firebase";
-import {useNavigate} from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase";
 import { AuthContext } from "../../context/AuthContext";
+import "./login.scss";
 
 const Login = () => {
-
-  const [error, setError] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(false);
+  const { dispatch } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
-
-  const {dispatch} = useContext(AuthContext);
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      dispatch({ type: "LOGIN", payload: userCredential.user });
+      navigate("/"); // Redirect to home page
+    } catch (error) {
+      setError(true);
+      console.error("Error logging in:", error.code, error.message);
+    }
+  };
 
-    
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-      // Signed up 
-      const user = userCredential.user;
-      dispatch({type: "LOGIN", payload: user})
-      navigate("/");
-      // ...
-      })
-      .catch((error) => {
-        setError(true);
-        // ..
-      });
-  }
   return (
     <div className="login">
       <form onSubmit={handleLogin}>
-        <input type="email" placeholder="email" onChange={e=>setEmail(e.target.value)} />
-        <input type="password" placeholder="password" onChange={e=>setPassword(e.target.value)} />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
         <button type="submit">Login</button>
-        {error && <span>Wrong email or password!</span>}
+        {error && <span className="error">Login failed. Please try again.</span>}
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

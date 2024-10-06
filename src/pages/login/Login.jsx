@@ -16,7 +16,8 @@ const Login = () => {
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      dispatch({ type: "LOGIN", payload: userCredential.user });
+      const user = userCredential.user; // This line is causing the warning
+      dispatch({ type: "LOGIN", payload: user });
       navigate("/"); // Redirect to home page
     } catch (error) {
       setError(true);
